@@ -27,23 +27,30 @@ export default class NewBill {
     const email = JSON.parse(localStorage.getItem("user")).email;
     formData.append("file", file);
     formData.append("email", email);
-    //Tester l'extension avec une regex et affichier un message d'erreur si le nom du fichier n'est pas bon.
 
-    this.store
-      .bills()
-      .create({
-        data: formData,
-        headers: {
-          noContentType: true,
-        },
-      })
-      .then(({ fileUrl, key }) => {
-        console.log(fileUrl);
-        this.billId = key;
-        this.fileUrl = fileUrl;
-        this.fileName = fileName;
-      })
-      .catch((error) => console.error(error));
+    const availableExtension = /.+jpeg$|.+jpg$|.+png$/i;
+
+    if (availableExtension.test(fileName)) {
+      // Retirer un message d'erreur
+      this.store
+        .bills()
+        .create({
+          data: formData,
+          headers: {
+            noContentType: true,
+          },
+        })
+        .then(({ fileUrl, key }) => {
+          console.log(fileUrl);
+          this.billId = key;
+          this.fileUrl = fileUrl;
+          this.fileName = fileName;
+        })
+        .catch((error) => console.error(error));
+    } else {
+      // Afficher un message d'erreur
+      return;
+    }
   };
   handleSubmit = (e) => {
     e.preventDefault();
