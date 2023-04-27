@@ -31,7 +31,7 @@ export default class NewBill {
     const availableExtension = /.+jpeg$|.+jpg$|.+png$/i;
 
     if (availableExtension.test(fileName)) {
-      // Retirer un message d'erreur
+      // Retirer un message d'erreur s'il y en a un
       this.store
         .bills()
         .create({
