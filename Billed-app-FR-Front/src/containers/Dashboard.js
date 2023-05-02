@@ -143,7 +143,6 @@ export default class {
     if (this.index === undefined || this.index !== index) this.index = index;
     const filteredBillsArray = filteredBills(bills, getStatus(this.index));
     const opennedTickets = $(`#status-bills-container${this.index} .bill-card`);
-    console.log(filteredBillsArray, opennedTickets.length);
 
     if (opennedTickets.length === 0) {
       $(`#arrow-icon${this.index}`).css({ transform: "rotate(0deg)" });
@@ -158,10 +157,11 @@ export default class {
       });
     } else {
       $(`#arrow-icon${this.index}`).css({ transform: "rotate(90deg)" });
+      $(`#status-bills-container${this.index}`).html("");
+
       filteredBillsArray.forEach((bill) => {
         $(`#open-bill${bill.id}`).off("click");
       });
-      $(`#status-bills-container${this.index}`).html("");
     }
 
     return bills;
