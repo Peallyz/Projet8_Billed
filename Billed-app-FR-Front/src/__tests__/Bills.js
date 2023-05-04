@@ -42,5 +42,14 @@ describe("Given I am connected as an employee", () => {
       const datesSorted = [...dates].sort(antiChrono);
       expect(dates).toEqual(datesSorted);
     });
+    // test("Then New bill button click should call handleClickNewBill", () => {
+    //   const newBillButton = screen.getByTestId("btn-new-bill");
+    //   const handleClickNewBillSpy = jest.spyOn(
+    //     newBillButton,
+    //     "handleClickNewBill"
+    //   );
+    //   newBillButton.click();
+    //   expect(handleClickNewBillSpy).toHaveBeenCalled();
+    // });
   });
 });
