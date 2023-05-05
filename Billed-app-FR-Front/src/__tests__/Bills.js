@@ -2,11 +2,14 @@
  * @jest-environment jsdom
  */
 // Add test here line 14 18 24 28-35 44-68
-import { screen, waitFor } from "@testing-library/dom";
+import { fireEvent, screen, waitFor } from "@testing-library/dom";
 import BillsUI from "../views/BillsUI.js";
 import { bills } from "../fixtures/bills.js";
-import { ROUTES_PATH } from "../constants/routes.js";
+import { ROUTES_PATH, ROUTES } from "../constants/routes.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
+import userEvent from "@testing-library/user-event";
+
+import Bills from "../containers/Bills.js";
 
 import router from "../app/Router.js";
 
@@ -42,14 +45,83 @@ describe("Given I am connected as an employee", () => {
       const datesSorted = [...dates].sort(antiChrono);
       expect(dates).toEqual(datesSorted);
     });
-    // test("Then New bill button click should call handleClickNewBill", () => {
-    //   const newBillButton = screen.getByTestId("btn-new-bill");
-    //   const handleClickNewBillSpy = jest.spyOn(
-    //     newBillButton,
-    //     "handleClickNewBill"
-    //   );
-    //   newBillButton.click();
-    //   expect(handleClickNewBillSpy).toHaveBeenCalled();
-    // });
+  });
+});
+
+describe("When i click New bill button", () => {
+  test("Then it should open newBills pages", () => {
+    const onNavigate = (pathname) => {
+      document.body.innerHTML = ROUTES({ pathname });
+    };
+    Object.defineProperty(window, "localStorage", {
+      value: localStorageMock,
+    });
+    window.localStorage.setItem(
+      "user",
+      JSON.stringify({
+        type: "Employee",
+      })
+    );
+
+    const store = jest.fn();
+
+    const billsContainer = new Bills({
+      document,
+      onNavigate,
+      store,
+      localStorage: window.localStorage,
+    });
+
+    document.body.innerHTML = BillsUI({ data: bills });
+
+    const spy = jest.fn(billsContainer.handleClickNewBill);
+    const newBillButton = screen.getByTestId("btn-new-bill");
+    spy(newBillButton);
+    fireEvent.click(newBillButton);
+
+    expect(spy).toHaveBeenCalled();
+    expect(screen.getByText("Envoyer une note de frais")).toBeTruthy();
+  });
+});
+
+describe("When i click eye icon", () => {
+  test("Then it should open bills modals", () => {
+    const onNavigate = (pathname) => {
+      document.body.innerHTML = ROUTES({ pathname });
+    };
+    Object.defineProperty(window, "localStorage", {
+      value: localStorageMock,
+    });
+    window.localStorage.setItem(
+      "user",
+      JSON.stringify({
+        type: "Employee",
+      })
+    );
+    const store = jest.fn();
+
+    const billsContainer = new Bills({
+      document,
+      onNavigate,
+      store,
+      localStorage: window.localStorage,
+    });
+
+    document.body.innerHTML = BillsUI({ data: bills });
+
+    const handleClickIconEye = jest.fn((icon) =>
+      billsContainer.handleClickIconEye(icon)
+    );
+    const iconEye = screen.getAllByTestId("icon-eye");
+    const modaleFile = document.getElementById("modaleFile");
+    $.fn.modal = jest.fn(() => modaleFile.classList.add("show"));
+
+    iconEye.forEach((icon) => {
+      icon.addEventListener("click", handleClickIconEye(icon));
+      fireEvent.click(icon);
+      expect(handleClickIconEye).toHaveBeenCalled();
+    });
+
+    expect(modaleFile.classList).toContain("show");
   });
 });
