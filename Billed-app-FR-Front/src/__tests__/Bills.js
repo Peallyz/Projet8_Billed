@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-// Add test here line 14 18 24 28-35 44-68
+// Add test here line 44-63
 import { fireEvent, screen, waitFor } from "@testing-library/dom";
 import BillsUI from "../views/BillsUI.js";
 import { bills } from "../fixtures/bills.js";
