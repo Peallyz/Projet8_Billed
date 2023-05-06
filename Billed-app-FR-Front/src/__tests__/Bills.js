@@ -10,6 +10,7 @@ import { ROUTES_PATH, ROUTES } from "../constants/routes.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
 import mockedStore from "../__mocks__/store";
 import router from "../app/Router.js";
+const { setupConsole } = require("jest-console");
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
@@ -179,5 +180,25 @@ describe("getBills", async () => {
     billsToDisplay.forEach((bill, index) => {
       expect(bill.date).toEqual(mockedBills[index].date);
     });
+  });
+  test("it should log an error message when formatDate throws an error", async () => {
+    const restoreConsole = setupConsole(); // setupConsole() retourne une fonction à appeler plus tard pour restaurer la console
+
+    // mock formatDate to throw an error
+    const mockFormatDate = jest.fn(() => {
+      throw new Error("formatDate error");
+    });
+
+    billsContainer.formatDate = mockFormatDate;
+
+    await billsContainer.getBills();
+
+    expect(console.log).toHaveBeenCalledWith(
+      expect.any(Error),
+      "for",
+      expect.any(Object)
+    );
+
+    restoreConsole(); // restore the console to its original state
   });
 });
