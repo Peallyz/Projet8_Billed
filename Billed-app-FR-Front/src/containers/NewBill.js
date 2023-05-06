@@ -35,7 +35,6 @@ export default class NewBill {
     const availableExtension = /.+jpeg$|.+jpg$|.+png$/i;
 
     if (availableExtension.test(fileName)) {
-      console.log("good ext");
       errorMessage.classList.remove("active");
       this.store
         .bills()
@@ -55,6 +54,7 @@ export default class NewBill {
     } else {
       errorMessage.classList.add("active");
       fileInput.value = null;
+
       return;
     }
   };
