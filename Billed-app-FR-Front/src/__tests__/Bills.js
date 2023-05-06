@@ -154,4 +154,15 @@ describe("getBills", async () => {
       expect(bill.status).toEqual(formatStatus(mockedBills[index].status));
     });
   });
+  test("should return undefined if this.store is undefined", async () => {
+    const undefinedBillsContainer = new Bills({
+      document,
+      onNavigate,
+      store: undefined,
+      localStorage: window.localStorage,
+    });
+
+    const billsToDisplay = await undefinedBillsContainer.getBills();
+    expect(billsToDisplay).toBeUndefined();
+  });
 });
