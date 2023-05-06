@@ -21,17 +21,22 @@ export default class NewBill {
     e.preventDefault();
     const file = this.document.querySelector(`input[data-testid="file"]`)
       .files[0];
+    const fileInput = this.document.querySelector(`input[data-testid="file"]`);
     const filePath = e.target.value.split(/\\/g);
     const fileName = filePath[filePath.length - 1];
     const formData = new FormData();
     const email = JSON.parse(localStorage.getItem("user")).email;
     formData.append("file", file);
     formData.append("email", email);
+    const errorMessage = document.querySelector(
+      ".form-newbill-container span.error"
+    );
 
     const availableExtension = /.+jpeg$|.+jpg$|.+png$/i;
 
     if (availableExtension.test(fileName)) {
-      // Retirer un message d'erreur s'il y en a un
+      console.log("good ext");
+      errorMessage.classList.remove("active");
       this.store
         .bills()
         .create({
@@ -48,7 +53,8 @@ export default class NewBill {
         })
         .catch((error) => console.error(error));
     } else {
-      // Afficher un message d'erreur
+      errorMessage.classList.add("active");
+      fileInput.value = null;
       return;
     }
   };
