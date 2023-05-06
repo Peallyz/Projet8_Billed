@@ -147,4 +147,11 @@ describe("getBills", async () => {
     expect(spyGetBills).toHaveBeenCalledTimes(1);
     expect(mockedBills.length).toBe(billsToDisplay.length);
   });
+
+  test("it should return formated Date and status", async () => {
+    billsToDisplay.forEach((bill, index) => {
+      expect(bill.date).toEqual(formatDate(mockedBills[index].date));
+      expect(bill.status).toEqual(formatStatus(mockedBills[index].status));
+    });
+  });
 });
