@@ -1,16 +1,14 @@
 /**
  * @jest-environment jsdom
  */
-// Add test here line 44-63
+
 import { fireEvent, screen, waitFor } from "@testing-library/dom";
 import BillsUI from "../views/BillsUI.js";
+import Bills from "../containers/Bills.js";
 import { bills } from "../fixtures/bills.js";
 import { ROUTES_PATH, ROUTES } from "../constants/routes.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
-import userEvent from "@testing-library/user-event";
-
-import Bills from "../containers/Bills.js";
-
+import mockedStore from "../__mocks__/store";
 import router from "../app/Router.js";
 
 describe("Given I am connected as an employee", () => {
@@ -123,5 +121,30 @@ describe("When i click eye icon", () => {
     });
 
     expect(modaleFile.classList).toContain("show");
+  });
+});
+
+describe("getBills", async () => {
+  const onNavigate = (pathname) => {
+    document.body.innerHTML = ROUTES({ pathname });
+  };
+  const billsContainer = new Bills({
+    document,
+    onNavigate,
+    store: mockedStore,
+    localStorage: window.localStorage,
+  });
+
+  const spyGetBills = jest.spyOn(billsContainer, "getBills");
+  const billsToDisplay = await billsContainer.getBills();
+  const mockedBills = await mockedStore.bills().list();
+  afterEach(() => {
+    // restaure l'espion créé avec spyOn
+    jest.restoreAllMocks();
+  });
+
+  test("it should display bills if bills are stored", async () => {
+    expect(spyGetBills).toHaveBeenCalledTimes(1);
+    expect(mockedBills.length).toBe(billsToDisplay.length);
   });
 });
