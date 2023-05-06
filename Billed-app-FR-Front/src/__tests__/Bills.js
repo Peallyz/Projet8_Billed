@@ -154,7 +154,7 @@ describe("getBills", async () => {
       expect(bill.status).toEqual(formatStatus(mockedBills[index].status));
     });
   });
-  test("should return undefined if this.store is undefined", async () => {
+  test("it should return undefined if this.store is undefined", async () => {
     const undefinedBillsContainer = new Bills({
       document,
       onNavigate,
@@ -164,5 +164,20 @@ describe("getBills", async () => {
 
     const billsToDisplay = await undefinedBillsContainer.getBills();
     expect(billsToDisplay).toBeUndefined();
+  });
+  test("it should return unformatted date if formatDate throws an error", async () => {
+    // mock formatDate to throw an error
+    const mockFormatDate = jest.fn(() => {
+      throw new Error("formatDate error");
+    });
+    billsContainer.formatDate = mockFormatDate;
+
+    const billsToDisplay = await billsContainer.getBills();
+    const mockedBills = await mockedStore.bills().list();
+
+    // verify that each bill has an unformatted date
+    billsToDisplay.forEach((bill, index) => {
+      expect(bill.date).toEqual(mockedBills[index].date);
+    });
   });
 });
