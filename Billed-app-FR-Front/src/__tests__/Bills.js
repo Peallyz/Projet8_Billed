@@ -126,7 +126,10 @@ describe("Given I am connected as an employee", () => {
         expect(document.querySelector(".modal")).toBeTruthy();
       });
     });
-    describe("I fetch right bills data successfully", () => {
+  });
+
+  describe("When I fetch all date", () => {
+    describe("No error occurs", () => {
       test("then all bills should be displayed", async () => {
         localStorage.setItem(
           "user",
@@ -145,7 +148,11 @@ describe("Given I am connected as an employee", () => {
         expect(allBills.length).toBe(4);
       });
     });
+
     describe("Error appends on fetch", () => {
+      jest.mock("../app/store", () => {
+        return mockStore;
+      });
       beforeEach(() => {
         jest.spyOn(mockStore, "bills");
         Object.defineProperty(window, "localStorage", {
@@ -172,7 +179,7 @@ describe("Given I am connected as an employee", () => {
           await waitFor(() => screen.getByTestId("error-message"));
           const error = screen.getByTestId("error-message");
           expect(error).toBeTruthy();
-          expect(error).toHaveTextContent("Erreur 500");
+          expect(error.innerText).toBe("Erreur 404");
         });
       });
       describe("It is a 404 error", () => {
@@ -185,7 +192,7 @@ describe("Given I am connected as an employee", () => {
           const error = screen.getByTestId("error-message");
 
           expect(error).toBeTruthy();
-          expect(error).toHaveTextContent("Erreur 404");
+          expect(error.innerText).toBe("Erreur 404");
         });
       });
     });
