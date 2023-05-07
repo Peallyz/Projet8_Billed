@@ -10,7 +10,6 @@ import { ROUTES_PATH, ROUTES } from "../constants/routes.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
 import mockedStore from "../__mocks__/store";
 import router from "../app/Router.js";
-const { setupConsole } = require("jest-console");
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
@@ -84,25 +83,14 @@ describe("When i click New bill button", () => {
 });
 
 describe("When i click eye icon", () => {
+  const onNavigate = (pathname) => {
+    document.body.innerHTML = ROUTES({ pathname });
+  };
   test("Then it should open bills modals", () => {
-    const onNavigate = (pathname) => {
-      document.body.innerHTML = ROUTES({ pathname });
-    };
-    Object.defineProperty(window, "localStorage", {
-      value: localStorageMock,
-    });
-    window.localStorage.setItem(
-      "user",
-      JSON.stringify({
-        type: "Employee",
-      })
-    );
-    const store = jest.fn();
-
     const billsContainer = new Bills({
       document,
       onNavigate,
-      store,
+      store: null,
       localStorage: window.localStorage,
     });
 
@@ -122,6 +110,21 @@ describe("When i click eye icon", () => {
     });
 
     expect(modaleFile.classList).toContain("show");
+  });
+
+  test("Then the modal should be displayed", () => {
+    document.body.innerHTML = BillsUI({ data: bills });
+    const billsContainer = new Bills({
+      document,
+      onNavigate,
+      store: null,
+      localStorage: window.localStorage,
+    });
+
+    const iconEye = document.querySelector(`div[data-testid="icon-eye"]`);
+    $.fn.modal = jest.fn();
+    billsContainer.handleClickIconEye(iconEye);
+    expect(document.querySelector(".modal")).toBeTruthy();
   });
 });
 
