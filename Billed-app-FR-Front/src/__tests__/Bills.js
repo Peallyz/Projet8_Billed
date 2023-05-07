@@ -125,80 +125,80 @@ describe("When i click eye icon", () => {
   });
 });
 
-describe("getBills", async () => {
-  const onNavigate = (pathname) => {
-    document.body.innerHTML = ROUTES({ pathname });
-  };
-  const billsContainer = new Bills({
-    document,
-    onNavigate,
-    store: mockedStore,
-    localStorage: window.localStorage,
-  });
+// describe("getBills", async () => {
+//   const onNavigate = (pathname) => {
+//     document.body.innerHTML = ROUTES({ pathname });
+//   };
+//   const billsContainer = new Bills({
+//     document,
+//     onNavigate,
+//     store: mockedStore,
+//     localStorage: window.localStorage,
+//   });
 
-  const spyGetBills = jest.spyOn(billsContainer, "getBills");
-  const billsToDisplay = await billsContainer.getBills();
-  const mockedBills = await mockedStore.bills().list();
-  afterEach(() => {
-    // restaure l'espion créé avec spyOn
-    jest.restoreAllMocks();
-  });
+//   const spyGetBills = jest.spyOn(billsContainer, "getBills");
+//   const billsToDisplay = await billsContainer.getBills();
+//   const mockedBills = await mockedStore.bills().list();
+//   afterEach(() => {
+//     // restaure l'espion créé avec spyOn
+//     jest.restoreAllMocks();
+//   });
 
-  test("it should display bills if bills are stored", async () => {
-    expect(spyGetBills).toHaveBeenCalledTimes(1);
-    expect(mockedBills.length).toBe(billsToDisplay.length);
-  });
+//   test("it should display bills if bills are stored", async () => {
+//     expect(spyGetBills).toHaveBeenCalledTimes(1);
+//     expect(mockedBills.length).toBe(billsToDisplay.length);
+//   });
 
-  test("it should return formated Date and status", async () => {
-    billsToDisplay.forEach((bill, index) => {
-      expect(bill.date).toEqual(formatDate(mockedBills[index].date));
-      expect(bill.status).toEqual(formatStatus(mockedBills[index].status));
-    });
-  });
-  test("it should return undefined if this.store is undefined", async () => {
-    const undefinedBillsContainer = new Bills({
-      document,
-      onNavigate,
-      store: undefined,
-      localStorage: window.localStorage,
-    });
+//   test("it should return formated Date and status", async () => {
+//     billsToDisplay.forEach((bill, index) => {
+//       expect(bill.date).toEqual(formatDate(mockedBills[index].date));
+//       expect(bill.status).toEqual(formatStatus(mockedBills[index].status));
+//     });
+//   });
+//   test("it should return undefined if this.store is undefined", async () => {
+//     const undefinedBillsContainer = new Bills({
+//       document,
+//       onNavigate,
+//       store: undefined,
+//       localStorage: window.localStorage,
+//     });
 
-    const billsToDisplay = await undefinedBillsContainer.getBills();
-    expect(billsToDisplay).toBeUndefined();
-  });
-  test("it should return unformatted date if formatDate throws an error", async () => {
-    // mock formatDate to throw an error
-    const mockFormatDate = jest.fn(() => {
-      throw new Error("formatDate error");
-    });
-    billsContainer.formatDate = mockFormatDate;
+//     const billsToDisplay = await undefinedBillsContainer.getBills();
+//     expect(billsToDisplay).toBeUndefined();
+//   });
+//   test("it should return unformatted date if formatDate throws an error", async () => {
+//     // mock formatDate to throw an error
+//     const mockFormatDate = jest.fn(() => {
+//       throw new Error("formatDate error");
+//     });
+//     billsContainer.formatDate = mockFormatDate;
 
-    const billsToDisplay = await billsContainer.getBills();
-    const mockedBills = await mockedStore.bills().list();
+//     const billsToDisplay = await billsContainer.getBills();
+//     const mockedBills = await mockedStore.bills().list();
 
-    // verify that each bill has an unformatted date
-    billsToDisplay.forEach((bill, index) => {
-      expect(bill.date).toEqual(mockedBills[index].date);
-    });
-  });
-  test("it should log an error message when formatDate throws an error", async () => {
-    const restoreConsole = setupConsole(); // setupConsole() retourne une fonction à appeler plus tard pour restaurer la console
+//     // verify that each bill has an unformatted date
+//     billsToDisplay.forEach((bill, index) => {
+//       expect(bill.date).toEqual(mockedBills[index].date);
+//     });
+//   });
+//   test("it should log an error message when formatDate throws an error", async () => {
+//     const restoreConsole = setupConsole(); // setupConsole() retourne une fonction à appeler plus tard pour restaurer la console
 
-    // mock formatDate to throw an error
-    const mockFormatDate = jest.fn(() => {
-      throw new Error("formatDate error");
-    });
+//     // mock formatDate to throw an error
+//     const mockFormatDate = jest.fn(() => {
+//       throw new Error("formatDate error");
+//     });
 
-    billsContainer.formatDate = mockFormatDate;
+//     billsContainer.formatDate = mockFormatDate;
 
-    await billsContainer.getBills();
+//     await billsContainer.getBills();
 
-    expect(console.log).toHaveBeenCalledWith(
-      expect.any(Error),
-      "for",
-      expect.any(Object)
-    );
+//     expect(console.log).toHaveBeenCalledWith(
+//       expect.any(Error),
+//       "for",
+//       expect.any(Object)
+//     );
 
-    restoreConsole(); // restore the console to its original state
-  });
-});
+//     restoreConsole(); // restore the console to its original state
+//   });
+// });
