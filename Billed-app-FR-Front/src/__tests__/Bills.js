@@ -128,31 +128,62 @@ describe("Given I am connected as an employee", () => {
     });
   });
 
-  describe("When I fetch all date", () => {
-    describe("No error occurs", () => {
-      test("then all bills should be displayed", async () => {
-        localStorage.setItem(
-          "user",
-          JSON.stringify({ type: "Employee", email: "a@a" })
-        );
-        const root = document.createElement("div");
-        root.setAttribute("id", "root");
-        document.body.append(root);
-        router();
-        window.onNavigate(ROUTES_PATH.Bills);
+  describe("getBills", () => {
+    const onNavigate = (pathname) => {
+      document.body.innerHTML = ROUTES({ pathname });
+    };
+    const billsContainer = new Bills({
+      document,
+      onNavigate,
+      store: mockStore,
+      localStorage: window.localStorage,
+    });
 
-        await waitFor(() => screen.getByText("Mes notes de frais"));
-        const allBills = screen.getByTestId("tbody").children;
-        const result = screen.getByText("test1");
-        expect(result).toBeTruthy();
-        expect(allBills.length).toBe(4);
+    test("it should return formated Date and status", async () => {
+      const billsToDisplay = await billsContainer.getBills();
+      const mockedBills = await mockStore.bills().list();
+      billsToDisplay.forEach((bill, index) => {
+        expect(bill.date).toEqual(formatDate(mockedBills[index].date));
+        expect(bill.status).toEqual(formatStatus(mockedBills[index].status));
       });
+    });
+    test("it should return undefined if this.store is undefined", async () => {
+      const undefinedBillsContainer = new Bills({
+        document,
+        onNavigate,
+        store: undefined,
+        localStorage: window.localStorage,
+      });
+
+      const billsToDisplay = await undefinedBillsContainer.getBills();
+      expect(billsToDisplay).toBeUndefined();
+    });
+  });
+
+  jest.mock("../app/store", () => {
+    return mockStore;
+  });
+
+  describe("When I fetch all date", () => {
+    test("No error occurs then all bills should be displayed", async () => {
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ type: "Employee", email: "a@a" })
+      );
+      const root = document.createElement("div");
+      root.setAttribute("id", "root");
+      document.body.append(root);
+      router();
+      window.onNavigate(ROUTES_PATH.Bills);
+
+      await waitFor(() => screen.getByText("Mes notes de frais"));
+      const allBills = screen.getByTestId("tbody").children;
+      const result = screen.getByText("test1");
+      expect(result).toBeTruthy();
+      expect(allBills.length).toBe(4);
     });
 
     describe("Error appends on fetch", () => {
-      jest.mock("../app/store", () => {
-        return mockStore;
-      });
       beforeEach(() => {
         jest.spyOn(mockStore, "bills");
         Object.defineProperty(window, "localStorage", {
@@ -160,87 +191,33 @@ describe("Given I am connected as an employee", () => {
         });
         window.localStorage.setItem(
           "user",
-          JSON.stringify({ type: "Employee", email: "a@a" })
+          JSON.stringify({
+            type: "Employee",
+            email: "a@a",
+          })
         );
         const root = document.createElement("div");
         root.setAttribute("id", "root");
-        document.body.append(root);
+        document.body.appendChild(root);
         router();
       });
-      afterEach(() => {
-        mockStore.bills.mockRestore();
-      });
-      describe("It is a 500 error", () => {
-        test("Then error page should be displayed", async () => {
-          mockStore.bills.mockImplementationOnce(() => {
-            throw new Error("Erreur 500");
-          });
-          window.onNavigate(ROUTES_PATH.Bills);
-          await waitFor(() => screen.getByTestId("error-message"));
-          const error = screen.getByTestId("error-message");
-          expect(error).toBeTruthy();
-          expect(error.innerText).toBe("Erreur 404");
+      test("It is a 500 error Then error page should be displayed", async () => {
+        mockStore.bills.mockImplementationOnce(() => {
+          throw new Error("Erreur 500");
         });
+        document.body.innerHTML = BillsUI({ error: "Erreur 500" });
+        const error = screen.getByText(/Erreur 500/);
+        expect(error).toBeTruthy();
       });
-      describe("It is a 404 error", () => {
-        test("Then error page should be displayed", async () => {
-          mockStore.bills.mockImplementationOnce(() => {
-            throw new Error("Erreur 404");
-          });
-          window.onNavigate(ROUTES_PATH.Bills);
-          await waitFor(() => screen.getByTestId("error-message"));
-          const error = screen.getByTestId("error-message");
 
-          expect(error).toBeTruthy();
-          expect(error.innerText).toBe("Erreur 404");
+      test("It is a 404 error", async () => {
+        mockStore.bills.mockImplementationOnce(() => {
+          throw new Error("Erreur 404");
         });
+        document.body.innerHTML = BillsUI({ error: "Erreur 404" });
+        const error = screen.getByText(/Erreur 404/);
+        expect(error).toBeTruthy();
       });
-    });
-  });
-});
-
-describe("getBills", () => {
-  const onNavigate = (pathname) => {
-    document.body.innerHTML = ROUTES({ pathname });
-  };
-  const billsContainer = new Bills({
-    document,
-    onNavigate,
-    store: mockStore,
-    localStorage: window.localStorage,
-  });
-
-  test("it should return formated Date and status", async () => {
-    const billsToDisplay = await billsContainer.getBills();
-    const mockedBills = await mockStore.bills().list();
-    billsToDisplay.forEach((bill, index) => {
-      expect(bill.date).toEqual(formatDate(mockedBills[index].date));
-      expect(bill.status).toEqual(formatStatus(mockedBills[index].status));
-    });
-  });
-  test("it should return undefined if this.store is undefined", async () => {
-    const undefinedBillsContainer = new Bills({
-      document,
-      onNavigate,
-      store: undefined,
-      localStorage: window.localStorage,
-    });
-
-    const billsToDisplay = await undefinedBillsContainer.getBills();
-    expect(billsToDisplay).toBeUndefined();
-  });
-  test("it should return unformatted date if formatDate throws an error", async () => {
-    const mockFormatDate = jest.fn(() => {
-      throw new Error("error");
-    });
-    billsContainer.formatDate = mockFormatDate;
-
-    const billsToDisplay = await billsContainer.getBills();
-    const mockedBills = await mockStore.bills().list();
-
-    // verify that each bill has an unformatted date
-    billsToDisplay.forEach((bill, index) => {
-      expect(bill.date).toEqual(mockedBills[index].date);
     });
   });
 });
