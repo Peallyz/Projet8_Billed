@@ -2,8 +2,6 @@
  * @jest-environment jsdom
  */
 
-// add test here 40,62,73-85,91-111
-
 import LoginUI from "../views/LoginUI";
 import Login from "../containers/Login.js";
 import { ROUTES } from "../constants/routes";
