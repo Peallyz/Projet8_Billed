@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-// Add test here line 20, 94, 159 - 163;
+
 import { fireEvent, screen, waitFor } from "@testing-library/dom";
 import userEvent from "@testing-library/user-event";
 import DashboardFormUI from "../views/DashboardFormUI.js";
