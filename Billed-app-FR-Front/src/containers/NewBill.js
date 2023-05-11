@@ -45,12 +45,11 @@ export default class NewBill {
           },
         })
         .then(({ fileUrl, key }) => {
-          console.log(fileUrl);
           this.billId = key;
           this.fileUrl = fileUrl;
           this.fileName = fileName;
         })
-        .catch((error) => console.error(error));
+        .catch((e) => console.error(error));
     } else {
       errorMessage.classList.add("active");
       fileInput.value = null;
