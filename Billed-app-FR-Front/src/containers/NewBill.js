@@ -31,32 +31,32 @@ export default class NewBill {
     const errorMessage = document.querySelector(
       ".form-newbill-container span.error"
     );
-
-    const availableExtension = /.+jpeg$|.+jpg$|.+png$/i;
-
-    if (availableExtension.test(fileName)) {
+    const fileExtension = fileName.split(".").pop();
+    console.log(fileExtension);
+    const availableExtension = /jpeg$|jpg$|png$/i;
+    if (availableExtension.test(fileExtension)) {
       errorMessage.classList.remove("active");
-      this.store
-        .bills()
-        .create({
-          data: formData,
-          headers: {
-            noContentType: true,
-          },
-        })
-        .then(({ fileUrl, key }) => {
-          this.billId = key;
-          this.fileUrl = fileUrl;
-          this.fileName = fileName;
-        })
-        .catch((e) => console.error(error));
     } else {
       errorMessage.classList.add("active");
       fileInput.value = null;
-
-      return;
     }
+
+    this.store
+      .bills()
+      .create({
+        data: formData,
+        headers: {
+          noContentType: true,
+        },
+      })
+      .then(({ fileUrl, key }) => {
+        this.billId = key;
+        this.fileUrl = fileUrl;
+        this.fileName = fileName;
+      })
+      .catch((e) => console.error(error));
   };
+
   handleSubmit = (e) => {
     e.preventDefault();
     console.log(
