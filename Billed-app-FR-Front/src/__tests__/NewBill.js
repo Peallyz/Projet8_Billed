@@ -91,7 +91,7 @@ describe("Given I am connected as an employee", () => {
         );
 
         // Check if handleChangeFile has been called and if file input has been cleared and if error message is displayed
-        expect(errorMessage.classList.contains("active")).toBe(true);
+        expect(errorMessage.classList).toContain("active");
         expect(handleFileChange).toHaveBeenCalled();
         expect(file.files[0].name).toBe("test.txt");
         expect(file.value).toBe("");
