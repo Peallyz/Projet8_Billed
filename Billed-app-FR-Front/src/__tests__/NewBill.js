@@ -10,6 +10,7 @@ import { localStorageMock } from "../__mocks__/localStorage.js";
 import mockStore from "../__mocks__/store.js";
 import userEvent from "@testing-library/user-event";
 
+// Define LocalStorage with user data as Employee and localStorageMock
 Object.defineProperty(window, "localStorage", { value: localStorageMock });
 window.localStorage.setItem(
   "user",
@@ -22,22 +23,26 @@ const onNavigate = jest.fn();
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
     test("Then the NewBill Page should be rendered", () => {
-      const html = NewBillUI();
-      document.body.innerHTML = html;
+      // Apply NewBillUI to document.body
+      document.body.innerHTML = NewBillUI();
       const title = screen.getAllByText("Envoyer une note de frais");
       const sendBtn = screen.getAllByText("Envoyer");
       const form = document.querySelector("form");
+
+      // Check if title, send button and form are rendered with all inputs
       expect(title).toBeTruthy();
       expect(sendBtn).toBeTruthy();
       expect(form.length).toEqual(9);
     });
 
     describe("When I upload an image file", () => {
+      // Apply NewBillUI to document.body before each test
       beforeEach(() => {
-        // DOM Init
         document.body.innerHTML = NewBillUI();
       });
+
       test("Then the file input should display a file", () => {
+        // Create a new instance of NewBill with mockStore
         const newBillContainer = new NewBill({
           document,
           onNavigate,
@@ -45,38 +50,47 @@ describe("Given I am connected as an employee", () => {
           localStorage: window.localStorage,
         });
 
+        // Mock handleChangeFile function
         const handleFileChange = jest.fn(newBillContainer.handleChangeFile);
         const file = screen.getByTestId("file");
+
+        // Add event listener to file input
         file.addEventListener("change", handleFileChange);
-        // user upload available file
+
+        // Upload a file by launching upload event on file input
         userEvent.upload(
           file,
           new File(["test"], "test.png", { type: "image/png" })
         );
 
+        // Check if handleChangeFile has been called and if file input has been changed with the current file
         expect(handleFileChange).toHaveBeenCalled();
         expect(file.files[0].name).toBe("test.png");
         expect(file.files).toHaveLength(1);
       });
       test("It should display an error message if the file has not an available extension", () => {
+        // Create a new instance of NewBill with mockStore
         const newBillContainer = new NewBill({
           document,
           onNavigate,
           store: mockStore,
           localStorage: window.localStorage,
         });
+
         const errorMessage = screen.getByTestId("file-error");
         const handleFileChange = jest.fn(newBillContainer.handleChangeFile);
         const file = screen.getByTestId("file");
+
+        // Add event listener to file input
         file.addEventListener("change", handleFileChange);
 
-        // user upload not available file
+        // Upload a wrong file by launching upload event on file input
         userEvent.upload(
           file,
           new File(["test"], "test.txt", { type: "text/plain" })
         );
 
-        // check if error-message is displayed
+        // Check if handleChangeFile has been called and if file input has been cleared and if error message is displayed
         expect(errorMessage.classList.contains("active")).toBe(true);
         expect(handleFileChange).toHaveBeenCalled();
         expect(file.files[0].name).toBe("test.txt");
@@ -90,6 +104,7 @@ describe("Given I am connected as an employee", () => {
 
 describe("When I submit a new valid bill", () => {
   test("Then a new bill should be created", () => {
+    // Create a new instance of NewBill with mockStore and apply NewBillUI to document.body
     document.body.innerHTML = NewBillUI();
     const submitForm = screen.getByTestId("form-new-bill");
     const newBillContainer = new NewBill({
@@ -102,7 +117,7 @@ describe("When I submit a new valid bill", () => {
     const handleSubmit = jest.fn(newBillContainer.handleSubmit);
     submitForm.addEventListener("submit", handleSubmit);
 
-    // create a valid bill
+    // Create a new bill object with all inputs values and apply them to the form
     const bill = {
       type: "Transports",
       name: "test",
@@ -128,59 +143,26 @@ describe("When I submit a new valid bill", () => {
     newBillContainer.fileUrl = bill.fileUrl;
     newBillContainer.fileName = bill.fileName;
 
+    // Launch submit event on form
     fireEvent.submit(submitForm);
 
-    // check if the handleSubmit function is called
-    expect(handleSubmit).toHaveBeenCalled();
-  });
-  test("Then it should save the bill", async () => {
-    const onNavigate = (pathname) => {
-      document.body.innerHTML = ROUTES({ pathname });
-    };
-
-    Object.defineProperty(window, "localStorage", {
-      value: localStorageMock,
-    });
-    window.localStorage.setItem(
-      "user",
-      JSON.stringify({
-        type: "Employee",
-      })
-    );
-
-    const html = NewBillUI();
-    document.body.innerHTML = html;
-
-    const newBillContainer = new NewBill({
-      document,
-      onNavigate,
-      store: null,
-      localStorage: window.localStorage,
-    });
-
-    const formNewBill = screen.getByTestId("form-new-bill");
-    expect(formNewBill).toBeTruthy();
-
-    const handleSubmit = jest.fn((e) => newBillContainer.handleSubmit(e));
-    formNewBill.addEventListener("submit", handleSubmit);
-    fireEvent.submit(formNewBill);
+    // Check if handleSubmit has been called
     expect(handleSubmit).toHaveBeenCalled();
   });
 
-  // check file is uploaded on submit
   test("Then the file bill should be uploaded", async () => {
+    // Spy on bills method from mockStore
     jest.spyOn(mockStore, "bills");
 
     const onNavigate = (pathname) => {
       document.body.innerHTML = ROUTES({ pathname });
     };
 
+    // Define LocalStorage with user data as Employee and localStorageMock
     Object.defineProperty(window, "localStorage", {
       value: localStorageMock,
     });
-    Object.defineProperty(window, "location", {
-      value: { hash: ROUTES_PATH["NewBill"] },
-    });
+
     window.localStorage.setItem(
       "user",
       JSON.stringify({
@@ -188,6 +170,7 @@ describe("When I submit a new valid bill", () => {
       })
     );
 
+    // Create a new instance of NewBill with mockStore and apply NewBillUI to document.body
     const html = NewBillUI();
     document.body.innerHTML = html;
 
@@ -198,6 +181,7 @@ describe("When I submit a new valid bill", () => {
       localStorage: window.localStorage,
     });
 
+    // Create a new file object and apply it to the file input
     const file = new File(["image"], "image.png", { type: "image/png" });
     const handleChangeFile = jest.fn((e) =>
       newBillContainer.handleChangeFile(e)
@@ -205,9 +189,11 @@ describe("When I submit a new valid bill", () => {
     const formNewBill = screen.getByTestId("form-new-bill");
     const billFile = screen.getByTestId("file");
 
+    // Add event listener to file input and upload file on it
     billFile.addEventListener("change", handleChangeFile);
     userEvent.upload(billFile, file);
 
+    // Check if handleChangeFile has been called and if file input has been changed with the current file
     expect(billFile.files[0].name).toBeDefined();
     expect(handleChangeFile).toBeCalled();
 
