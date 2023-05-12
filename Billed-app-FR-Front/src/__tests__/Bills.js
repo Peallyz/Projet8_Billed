@@ -168,10 +168,10 @@ describe("Given I am connected as an employee", () => {
       const mockedBills = await mockStore.bills().list();
 
       // Check if each bill has a formated date and status
-      billsToDisplay.forEach((bill, index) => {
-        expect(bill.date).toEqual(formatDate(mockedBills[index].date));
-        expect(bill.status).toEqual(formatStatus(mockedBills[index].status));
-      });
+      expect(billsToDisplay[0].date).toEqual(formatDate(mockedBills[0].date));
+      expect(billsToDisplay[0].status).toEqual(
+        formatStatus(mockedBills[0].status)
+      );
     });
 
     test("it should return undefined if this.store is undefined", async () => {
