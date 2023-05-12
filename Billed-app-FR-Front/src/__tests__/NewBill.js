@@ -5,7 +5,7 @@
 import { fireEvent, screen } from "@testing-library/dom";
 import NewBillUI from "../views/NewBillUI.js";
 import NewBill from "../containers/NewBill.js";
-import { ROUTES, ROUTES_PATH } from "../constants/routes";
+import { ROUTES } from "../constants/routes";
 import { localStorageMock } from "../__mocks__/localStorage.js";
 import mockStore from "../__mocks__/store.js";
 import userEvent from "@testing-library/user-event";
@@ -53,6 +53,7 @@ describe("Given I am connected as an employee", () => {
         // Mock handleChangeFile function
         const handleFileChange = jest.fn(newBillContainer.handleChangeFile);
         const file = screen.getByTestId("file");
+        const errorMessage = screen.getByTestId("file-error");
 
         // Add event listener to file input
         file.addEventListener("change", handleFileChange);
