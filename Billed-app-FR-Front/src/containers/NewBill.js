@@ -24,7 +24,7 @@ export default class NewBill {
         fileInput.value = null;
       } else {
         errorMessage.classList.remove("active");
-        this.handleChangeFile;
+        this.handleChangeFile(e);
       }
     });
     this.fileUrl = null;
@@ -34,8 +34,7 @@ export default class NewBill {
   }
   handleChangeFile = (e) => {
     e.preventDefault();
-    const file = this.document.querySelector(`input[data-testid="file"]`)
-      .files[0];
+    const file = document.querySelector(`input[data-testid="file"]`).files[0];
     const filePath = e.target.value.split(/\\/g);
     const fileName = filePath[filePath.length - 1];
     const formData = new FormData();
