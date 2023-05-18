@@ -55,7 +55,7 @@ export default class NewBill {
         this.fileUrl = fileUrl;
         this.fileName = fileName;
       })
-      .catch((e) => console.error(error));
+      .catch((error) => console.error(error));
   };
 
   handleSubmit = (e) => {
