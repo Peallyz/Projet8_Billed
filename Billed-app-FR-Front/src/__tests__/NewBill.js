@@ -53,7 +53,6 @@ describe("Given I am connected as an employee", () => {
         // Mock handleChangeFile function
         const handleFileChange = jest.fn(newBillContainer.handleChangeFile);
         const file = screen.getByTestId("file");
-        const errorMessage = screen.getByTestId("file-error");
 
         // Add event listener to file input
         file.addEventListener("change", handleFileChange);
